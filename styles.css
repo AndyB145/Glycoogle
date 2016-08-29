@@ -1,0 +1,21 @@
+@charset "UTF-8";
+/* CSS Document */
+
+.center {
+	width: 300pt;
+	margin: auto;
+	border: 3px solid green;
+	align-items: center
+}
+
+.centerImage {
+	width: 1062pt;
+	height: 200pt;
+	margin: auto;
+	align-items: center
+}
+.search {
+	display: flex;
+	align-items: center;
+	margin: auto;
+}

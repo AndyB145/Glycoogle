@@ -2,31 +2,10 @@
 import cgi
 import cgitb
 from requests import request, codes
+import mysql.connector
 
 cgitb.enable()
 
-'''
-#Broken python mysql interactor
-import mysql.connector
-from mysql.connector import errorcode
-
-try:
-    cnx = mysql.connector.connect(user='andybaay_Andy',
-                                  password='%~P_hZS#6+9m',
-                                  host='206.221.178.138',
-                                  database='andybaay_glycomeDB')
-    print('<h2>Success Baby!</h2>')
-except mysql.connector.Error as err:
-    if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
-        print("<h1>Something is wrong with your user name or password</h1>")
-    elif err.errno == errorcode.ER_BAD_DB_ERROR:
-        print("<h1>Database does not exist</h1>")
-    else:
-        print(err)
-else:
-
-    cnx.close()
-'''
 
 def main():
     # First line, *first character*, must have header
@@ -48,22 +27,41 @@ def main():
             Please fill in the name field.
         '''
     else:
-        print "<p>Here is the Query: %s world</p>" % (form["search"].value)
-        return
+        queryStructure = form["search"].value.replace(' ', '\n')
+        print "<H3>Here is the Query:</H3><p> %s </p>" % repr(
+            queryStructure)
 
-    # Query the Swiss search tool for the matching ids
-    swissResults = Requester(form["search"].value)
-    print "<p> %s </p>" % formatIds(swissResults.getIDs())
-    print "<p> That is all </p>"
+    try:
+        # Query the Swiss search tool for the matching ids
+        swissResults = Requester(queryStructure)
+        print "<H2>Here are the IDs:</H2><p> %s </p>" % swissResults.getIDs()
 
-'''Takes a list of ids and places them in a string that will be sent
-to the php request. Fromatted as "n #1 #2... #n" where n is the
-total number of ids'''
-def formatIds(listIds):
-    returnString = '' + len(listIds)
-    for id in listIds:
-        returnString += " " + id
-    return returnString
+        # Then get the structure data from AndyBaay's database
+        # Connecting to the database
+        print '<h3>Trying to connect to AndyBaay\'s Glycome DB cache...</h3>'
+        try:
+            cnx = mysql.connector.connect(user='andybaay_general',
+                                          password='ineedglycans',
+                                          database='andybaay_glycomeDB',
+                                          host='206.221.178.138')
+            cnx.connect()
+            print('<h3>Success!</h3>')
+        except mysql.connector.Error as err:
+            if err.errno == mysql.connector.errorcode.ER_ACCESS_DENIED_ERROR:
+                print(
+                "<h1>Something is wrong with your user name or password</h1>")
+            elif err.errno == mysql.connector.errorcode.ER_BAD_DB_ERROR:
+                print("<h1>Database does not exist</h1>")
+            else:
+                print(err)
+        else:
+
+            cnx.close()
+
+        #print "<p> %s </p>" % swissResults.getIDs()
+        print "<p> That is all </p>"
+    except Exception,e:
+        print "<p> Recieved an error with your search: %s </p>" %e
 
 
 class BadStructure(Exception):
@@ -224,6 +222,7 @@ KKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKAP/Z'''
 
         # If we get a good request, proceed to parse the response for the
         # Glycome_DB id numbers
+        print '<H2>Here is the response from GLYS3:</H2>'
         if response.status_code == codes.ok:
             print(response.content)
             # Split on the beginning of each url that includes the glycan id num

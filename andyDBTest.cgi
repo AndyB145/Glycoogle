@@ -20,11 +20,7 @@ def main():
                                       database='andybaay_glycomeDB',
                                       host='206.221.178.138')
         cnx.connect()
-        cnx.close()
         print('<h2>Success Baby!</h2>')
-    except Exception,e:
-        print("<h1>Database is not talking to us: %s </h1>") %e
-    '''
     except mysql.connector.Error as err:
         if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
             print("<h1>Something is wrong with your user name or password</h1>")
@@ -35,6 +31,6 @@ def main():
     else:
 
         cnx.close()
-    '''
+
 if __name__ == "__main__":
     main()

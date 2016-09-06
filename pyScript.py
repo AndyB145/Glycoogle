@@ -65,7 +65,7 @@ def main():
                   "%s </p>" % repr(orderedIds)
             print "<h3>Score Dictionary: </h3><p> " \
                   "%s </p>" % repr(scores)
-            
+
         except mysql.connector.Error as err:
             if err.errno == mysql.connector.errorcode.ER_ACCESS_DENIED_ERROR:
                 print(
